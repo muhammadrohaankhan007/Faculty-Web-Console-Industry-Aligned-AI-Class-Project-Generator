@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHU Faculty Console — AI Project Generator</title>
+    <style>
+        /* ==========================================
+           COLOR PALETTE & CSS VARIABLES
+           ========================================== */
+        :root {
+            --shu-navy: #0F2043;
+            --shu-navy-light: #1A346B;
+            --shu-emerald: #107C41;
+            --shu-emerald-hover: #0D6334;
+            --shu-gold: #D4AF37;
+            --bg-light: #F4F7FA;
+            --card-bg: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #6C7A89;
+            --border-color: #E2E8F0;
+            --code-bg: #0B172E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           TOP NAVIGATION / HEADER
+           ========================================== */
+        header {
+            background-color: var(--shu-navy);
+            color: #FFFFFF;
+            padding: 1.5rem 2rem;
+            border-bottom: 4px solid var(--shu-emerald);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .brand p {
+            color: #A0AEC0;
+            font-size: 0.9rem;
+        }
+
+        .tagline-badge {
+            background-color: rgba(16, 124, 65, 0.2);
+            border: 1px solid var(--shu-emerald);
+            color: #2ECC71;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           MAIN CONTAINER & LAYOUT GRID
+           ========================================== */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==========================================
+           FORM CONSOLE SIDEBAR
+           ========================================== */
+        .sidebar-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.8rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            height: fit-content;
+        }
+
+        .sidebar-card h2 {
+            font-size: 1.25rem;
+            color: var(--shu-navy);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-card h2::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--shu-emerald);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--shu-navy);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #FFFFFF;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: var(--shu-emerald);
+            box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.15);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background-color: var(--shu-emerald);
+            color: #FFFFFF;
+            border: none;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--shu-emerald-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.99);
+        }
+
+        /* ==========================================
+           MAIN CONTENT / DISPLAY AREA
+           ========================================== */
+        .main-display {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--shu-navy);
+            font-weight: 700;
+        }
+
+        .badge-dept {
+            background-color: #E8F5E9;
+            color: var(--shu-emerald);
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .info-item label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+        }
+
+        .info-item span {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--shu-navy);
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            color: var(--shu-navy);
+            font-weight: 700;
+            margin: 1.2rem 0 0.5rem 0;
+        }
+
+        .deliverables-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .deliverables-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .deliverables-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--shu-emerald);
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           CODE & PROMPT DISPLAY BOX
+           ========================================== */
+        .prompt-container {
+            position: relative;
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .prompt-text {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            color: #A3E635;
+            font-size: 0.88rem;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: var(--shu-navy-light);
+            color: #FFFFFF;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--shu-emerald);
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background-color: #FFFFFF;
+            color: var(--shu-navy);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+        }
+
+        /* Print Media Styles */
+        @media print {
+            header, .sidebar-card, .btn-copy, .actions-bar {
+                display: none !important;
+            }
+            .container {
+                grid-template-columns: 1fr;
+                margin: 0;
+                padding: 0;
+            }
+            .card {
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Banner -->
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <h1>SALIM HABIB UNIVERSITY</h1>
+                <p>Faculty Web Console — Industry-Aligned AI Class Project Generator</p>
+            </div>
+            <div class="tagline-badge">
+                Karachi Industrial Cluster Integration
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="container">
+        
+        <!-- Sidebar Console Controls -->
+        <aside class="sidebar-card">
+            <h2>Project Parameters</h2>
+            <form id="projectForm" onsubmit="event.preventDefault(); generateProject();">
+                
+                <div class="form-group">
+                    <label for="department">Academic Department</label>
+                    <select id="department" onchange="populateCourses()">
+                        <option value="cs">Computer Science & AI</option>
+                        <option value="bio">Biosciences & Biotechnology</option>
+                        <option value="pharm">Pharmacy (Pharm-D)</option>
+                        <option value="mgmt">Management Sciences (BBA/MBA)</option>
+                        <option value="bme">Biomedical Engineering</option>
+                        <option value="social">Social Sciences & Humanities</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="course">Target Course</label>
+                    <select id="course">
+                        <!-- Options dynamically loaded via JS -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="semester">Semester Level</label>
+                    <select id="semester">
+                        <option value="1st & 2nd Semester (Freshmen)">1st & 2nd Semester (Freshmen)</option>
+                        <option value="3rd & 4th Semester (Mid-Level)">3rd & 4th Semester (Mid-Level)</option>
+                        <option value="5th & 6th Semester (Advanced)">5th & 6th Semester (Advanced)</option>
+                        <option value="7th & 8th Semester (Final Year / FYP)">7th & 8th Semester (Final Year)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="industry">Karachi Industrial Zone</label>
+                    <select id="industry">
+                        <option value="Korangi Industrial Area (Manufacturing & Biotech)">Korangi Industrial Area</option>
+                        <option value="Port Qasim & Landhi (Logistics & Supply Chain)">Port Qasim & Landhi Logistics</option>
+                        <option value="S.I.T.E Area (Textiles & Chemical Processing)">S.I.T.E Area Textiles & Chemicals</option>
+                        <option value="Sindh Health Corridor (JPMC, AKUH, Indus Hospital)">Sindh Healthcare Network</option>
+                        <option value="Karachi Retail & E-Commerce Micro-SMEs">Karachi Retail Micro-SMEs</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Generate Assignment Brief
+                </button>
+            </form>
+        </aside>
+
+        <!-- Main Display / Preview Card -->
+        <main class="main-display">
+            <div class="card" id="outputCard">
+                <div class="card-header">
+                    <div>
+                        <span class="badge-dept" id="outBadge">Department of Computer Science</span>
+                        <h2 class="card-title" id="outTitle">Database Management Systems: Applied Project</h2>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Target Level</label>
+                        <span id="outLevel">1st & 2nd Semester (Freshmen)</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Industrial Context</label>
+                        <span id="outIndustry">Port Qasim & Landhi Logistics</span>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Assignment Challenge</h3>
+                <p id="outConcept" style="color: var(--text-main); font-size: 0.98rem;">
+                    Loading project concept...
+                </p>
+
+                <h3 class="section-title">Student Deliverables & Workflow</h3>
+                <ul class="deliverables-list" id="outDeliverables">
+                    <!-- Deliverables rendered via JS -->
+                </ul>
+
+                <h3 class="section-title">Master AI Prompt for Course Instructor</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Copy and paste this structured prompt into ChatGPT, Claude, or Gemini to generate full student assignment sheets:
+                </p>
+                
+                <div class="prompt-container">
+                    <button class="btn-copy" id="copyBtn" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <div class="prompt-text" id="outPrompt">Generating prompt...</div>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn-secondary" onclick="window.print()">Print / Export PDF</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Console Logic -->
+    <script>
+        // Database of SHU Courses mapped by Department
+        const shuCourses = {
+            cs: [
+                "Database Management Systems",
+                "Programming Fundamentals",
+                "Web Application Development",
+                "Artificial Intelligence & Machine Learning"
+            ],
+            bio: [
+                "Fundamentals of Microbiology",
+                "Environmental Biotechnology",
+                "General Biochemistry",
+                "Cell & Molecular Biology"
+            ],
+            pharm: [
+                "Pharmaceutics-I (General)",
+                "Novel Drug Delivery Systems",
+                "Cosmetic Formulation & Technology",
+                "Clinical Pharmacy & Pharmacology"
+            ],
+            mgmt: [
+                "Principles of Marketing",
+                "Supply Chain & Logistics Analytics",
+                "Digital Business & E-Commerce",
+                "Financial Management & Accounting"
+            ],
+            bme: [
+                "Medical Instrumentation",
+                "Healthcare Technology Management",
+                "Biomaterials & Tissue Engineering",
+                "Biomedical Signal Processing"
+            ],
+            social: [
+                "Applied Psychology in Workplace",
+                "Technical & Business Communication",
+                "Sociology of Urban Development",
+                "Media Literacy & Mass Communication"
+            ]
+        };
+
+        // Department-Specific Project Blueprints
+        const projectBlueprints = {
+            cs: {
+                concept: "Design and implement a lightweight, automated inventory or diagnostic tracking module tailored for regional industrial operations.",
+                deliverables: [
+                    "Use Generative AI to construct initial database schemas, ER diagrams, and boilerplate scripts.",
+                    "Audit the AI-generated code to identify and fix security vulnerabilities (e.g., SQL injection, memory leaks).",
+                    "Submit benchmark documentation proving system performance under high data load conditions."
+                ]
+            },
+            bio: {
+                concept: "Conduct a synthesized research and microbiological risk assessment of industrial waste and water quality across local municipal discharge basins.",
+                deliverables: [
+                    "Utilize AI literature tools (Elicit/Consensus) to synthesize 15+ peer-reviewed articles on local bioremediation.",
+                    "Draft an experimental wet-lab assay protocol using structured AI prompting.",
+                    "Audit the proposed protocol for biosafety compliance, equipment availability at SHU, and reagent cost feasibility."
+                ]
+            },
+            pharm: {
+                concept: "Analyze compound stability, excipient interactions, and shelf-life parameters for locally manufactured formulations.",
+                deliverables: [
+                    "Prompt Generative AI to model active pharmaceutical ingredient (API) stability under tropical climate conditions.",
+                    "Verify AI-recommended formulation parameters against Drug Regulatory Authority of Pakistan (DRAP) standards.",
+                    "Conduct an oral viva defending critical edits made to the AI-generated formulation draft."
+                ]
+            },
+            mgmt: {
+                concept: "Simulate market entry, supply chain risk management, and pricing strategies for a Karachi manufacturing or retail SME.",
+                deliverables: [
+                    "Configure AI to simulate an aggressive buyer persona representing regional retail chains.",
+                    "Stress-test cash flow models, shipping logistics delays, and currency fluctuation scenarios.",
+                    "Present a strategic pitch deck documenting adjustments made following multi-round AI simulations."
+                ]
+            },
+            bme: {
+                concept: "Design a low-cost, portable clinical monitoring or telemetry module for rural health center deployment.",
+                deliverables: [
+                    "Utilize AI tools to draft initial system schematics, component lists, and signal flow charts.",
+                    "Evaluate AI component selections against local Karachi market availability and component replacement costs.",
+                    "Produce a risk audit confirming design compliance with international medical device safety standards (IEC 60601)."
+                ]
+            },
+            social: {
+                concept: "Evaluate workplace stress, digital communication patterns, and community wellbeing across urban Karachi organizations.",
+                deliverables: [
+                    "Utilize AI to assist in structuring qualitative survey instruments and thematic coding frameworks.",
+                    "Transcribe and process survey responses using AI natural language processing tools.",
+                    "Audit AI thematic summaries to detect and correct cultural biases specific to Pakistani organizational environments."
+                ]
+            }
+        };
+
+        // Populate Target Courses when Department changes
+        function populateCourses() {
+            const deptKey = document.getElementById("department").value;
+            const courseSelect = document.getElementById("course");
+            courseSelect.innerHTML = "";
+
+            shuCourses[deptKey].forEach(courseName => {
+                const opt = document.createElement("option");
+                opt.value = courseName;
+                opt.textContent = courseName;
+                courseSelect.appendChild(opt);
+            });
+        }
+
+        // Generate Project Brief & Master AI Prompt
+        function generateProject() {
+            const deptKey = document.getElementById("department").value;
+            const deptText = document.getElementById("department").options[document.getElementById("department").selectedIndex].text;
+            const courseText = document.getElementById("course").value;
+            const levelText = document.getElementById("semester").value;
+            const industryText = document.getElementById("industry").value;
+
+            const blueprint = projectBlueprints[deptKey];
+
+            // Update UI Output Text
+            document.getElementById("outBadge").textContent = `Faculty of ${deptText}`;
+            document.getElementById("outTitle").textContent = `${courseText}`;
+            document.getElementById("outLevel").textContent = levelText;
+            document.getElementById("outIndustry").textContent = industryText;
+            document.getElementById("outConcept").textContent = blueprint.concept;
+
+            // Render Deliverables
+            const delivUl = document.getElementById("outDeliverables");
+            delivUl.innerHTML = "";
+            blueprint.deliverables.forEach(itemText => {
+                const li = document.createElement("li");
+                li.textContent = itemText;
+                delivUl.appendChild(li);
+            });
+
+            // Construct Master Instructor Prompt
+            const masterPrompt = `Act as an academic professor in the Department of ${deptText} at Salim Habib University (SHU), Karachi.
+
+I am designing a class assignment for my course: "${courseText}" targeted at ${levelText} students.
+
+Assignment Objective:
+Connect academic theory to practical problems in Pakistan's industrial sector, specifically referencing: ${industryText}.
+
+Project Task Details:
+1. Core Challenge: ${blueprint.concept}
+2. Student AI Co-Pilot Rule: Students MUST use Generative AI tools (e.g., ChatGPT, Claude, Gemini) during the drafting and analysis phase, but must submit a full "AI Prompt & Audit Log".
+3. Mandatory Student Deliverables:
+   - ${blueprint.deliverables[0]}
+   - ${blueprint.deliverables[1]}
+   - ${blueprint.deliverables[2]}
+4. Assessment & Grading Rubric:
+   - 30% Methodological Rigor & Technical Execution
+   - 40% AI Critical Audit (Identifying AI errors, hallucinations, and adapting code/data to local Karachi realities)
+   - 30% In-Person Oral Viva Defense & Conceptual Understanding
+
+Please generate a 1-page Student Assignment Brief including learning outcomes, submission deadlines, and step-by-step instructions.`;
+
+            document.getElementById("outPrompt").textContent = masterPrompt;
+        }
+
+        // Copy Prompt to Clipboard
+        function copyPromptToClipboard() {
+            const promptContent = document.getElementById("outPrompt").textContent;
+            navigator.clipboard.writeText(promptContent).then(() => {
+                const btn = document.getElementById("copyBtn");
+                btn.textContent = "Copied!";
+                btn.style.backgroundColor = "var(--shu-emerald)";
+                setTimeout(() => {
+                    btn.textContent = "Copy Prompt";
+                    btn.style.backgroundColor = "var(--shu-navy-light)";
+                }, 2000);
+            });
+        }
+
+        // Initialize application state
+        window.onload = function() {
+            populateCourses();
+            generateProject();
+        };
+    </script>
+</body>
+</html>
